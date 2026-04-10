@@ -4,3 +4,7 @@ node_modules
 .next
 dist
 *.log
+dev.db
+backend/dev.db
+backend/prisma/dev.db
+*.tsbuildinfo

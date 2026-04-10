@@ -9,7 +9,7 @@ async function main() {
       clerkId: "seed-clerk",
       email: "organizer@localloop.dev",
       name: "Event Browser Organizer",
-      interests: ["running", "books", "sports", "travel"],
+      interests: JSON.stringify(["running", "books", "sports", "travel"]),
       city: "Chakradharpur",
       state: "Jharkhand",
       lat: 22.6763,

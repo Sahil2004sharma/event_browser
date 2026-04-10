@@ -45,23 +45,28 @@ export default function CreateEventPage() {
       setOpenAuthModal(true);
       return;
     }
-    await createEvent(
-      {
-        ...form,
-        dateTime: new Date(form.dateTime).toISOString(),
-        lat: Number(form.lat),
-        lng: Number(form.lng),
-        capacity: Number(form.capacity),
-        entryFee: Number(form.entryFee || 0),
-        prizeDetails: form.prizeDetails || null,
-        whatsappNumber: normalizedPhone || null,
-        discordLink: normalizedDiscord || null,
-        isPrivate: false
-      },
-      token
-    );
-    setStatus("Event created successfully.");
-    router.push("/dashboard");
+    setStatus("");
+    try {
+      await createEvent(
+        {
+          ...form,
+          dateTime: new Date(form.dateTime).toISOString(),
+          lat: Number(form.lat),
+          lng: Number(form.lng),
+          capacity: Number(form.capacity),
+          entryFee: Number(form.entryFee || 0),
+          prizeDetails: form.prizeDetails || null,
+          whatsappNumber: normalizedPhone || null,
+          discordLink: normalizedDiscord || null,
+          isPrivate: false
+        },
+        token
+      );
+      setStatus("Event created successfully.");
+      router.push("/dashboard");
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Could not create event.");
+    }
   };
 
   return (
@@ -75,7 +80,13 @@ export default function CreateEventPage() {
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-700">Event Description</label>
-        <textarea required className="w-full rounded-md border p-2" placeholder="Describe what this event is about" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+        <textarea
+          required
+          className="w-full rounded-md border p-2"
+          placeholder="Describe what this event is about (more than 50 words)"
+          value={form.description}
+          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+        />
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-700">Event Category</label>
@@ -150,7 +161,9 @@ export default function CreateEventPage() {
         </div>
       </div>
         <button className="rounded-md bg-indigo-600 px-4 py-2 text-white">Create Event</button>
-        {status && <p className="text-sm text-slate-600">{status}</p>}
+        {status && (
+          <p className={`text-sm ${status === "Event created successfully." ? "text-slate-600" : "text-red-600"}`}>{status}</p>
+        )}
       </form>
     </>
   );

@@ -10,15 +10,16 @@ export default function EventDetailsPage({ params }: { params: { id: string } })
   const [rating, setRating] = useState("5");
   const [reviewText, setReviewText] = useState("");
   const { data, isLoading, isError } = useQuery({ queryKey: ["event", params.id], queryFn: () => getEvent(params.id) });
-  if (isLoading) return <p>Loading event...</p>;
-  if (isError || !data) return <p className="text-red-600">Event not found.</p>;
 
   const mapUrl = useMemo(() => {
-    const lat = Number(data.lat ?? 22.6763);
-    const lng = Number(data.lng ?? 85.6289);
+    const lat = Number(data?.lat ?? 22.6763);
+    const lng = Number(data?.lng ?? 85.6289);
     const delta = 0.01;
     return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - delta}%2C${lat - delta}%2C${lng + delta}%2C${lat + delta}&layer=mapnik&marker=${lat}%2C${lng}`;
-  }, [data.lat, data.lng]);
+  }, [data?.lat, data?.lng]);
+
+  if (isLoading) return <p>Loading event...</p>;
+  if (isError || !data) return <p className="text-red-600">Event not found.</p>;
 
   const onSubmitReview = async (e: FormEvent) => {
     e.preventDefault();

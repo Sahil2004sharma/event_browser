@@ -1,3 +1,4 @@
+import "express-async-errors";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -20,5 +21,10 @@ app.use(healthRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventsRouter);
 app.use("/api/v1/users", usersRouter);
+
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("Unhandled API error:", err);
+  return res.status(500).json({ message: "Internal server error" });
+});
 
 export default app;

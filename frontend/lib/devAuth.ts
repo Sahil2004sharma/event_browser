@@ -1,30 +1,30 @@
 "use client";
 
-type DemoUser = { id: string; email: string; name: string };
+type AuthUser = { id: string; email: string; name: string };
 
-const KEY = "localloop_demo_user";
+const USER_KEY = "localloop_auth_user";
+const TOKEN_KEY = "localloop_auth_token";
 
-export function saveDemoUser(user: DemoUser) {
-  localStorage.setItem(KEY, JSON.stringify(user));
+export function saveAuthSession(token: string, user: AuthUser) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
-export function getDemoUser(): DemoUser | null {
-  const raw = localStorage.getItem(KEY);
+export function getAuthUser(): AuthUser | null {
+  const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as DemoUser;
+    return JSON.parse(raw) as AuthUser;
   } catch {
     return null;
   }
 }
 
-export function clearDemoUser() {
-  localStorage.removeItem(KEY);
+export function getAuthToken() {
+  return localStorage.getItem(TOKEN_KEY);
 }
 
-export function getDemoToken() {
-  const user = getDemoUser();
-  if (!user) return null;
-  const encoded = btoa(JSON.stringify(user));
-  return `dev:${encoded}`;
+export function clearAuthSession() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
 }

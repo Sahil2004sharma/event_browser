@@ -5,6 +5,8 @@ import "./globals.css";
 import { Providers } from "@/lib/providers";
 import AuthSync from "@/components/AuthSync";
 import ThemeToggle from "@/components/ThemeToggle";
+import DemoAuthControls from "@/components/DemoAuthControls";
+import ApiStatusBanner from "@/components/ApiStatusBanner";
 
 export const metadata: Metadata = {
   title: "Event Browser",
@@ -27,11 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <span className="brand-title">Event Browser</span>
                 </Link>
                 <div className="flex items-center gap-2 text-xs">
+                  <ApiStatusBanner />
                   <ThemeToggle />
                   <Link href="/dashboard" className="rounded-md border border-slate-300 px-3 py-1 text-slate-700">Dashboard</Link>
                   <Link href="/create-event" className="rounded-md border border-slate-300 px-3 py-1 text-slate-700">Create Event</Link>
-                  <Link href="/login" className="rounded-md border border-slate-300 px-3 py-1 text-slate-700">Sign In</Link>
-                  <Link href="/signup" className="rounded-md bg-indigo-600 px-3 py-1 text-white">Sign Up</Link>
+                  <DemoAuthControls />
                 </div>
               </nav>
             </header>
@@ -54,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <span className="brand-title">Event Browser</span>
                 </Link>
                 <div className="flex items-center gap-3">
+                  <ApiStatusBanner />
                   <ThemeToggle />
                   <Link href="/dashboard" className="text-sm hover:underline">Dashboard</Link>
                   <Link href="/create-event" className="text-sm hover:underline">Create Event</Link>

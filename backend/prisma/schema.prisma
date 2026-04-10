@@ -3,13 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum RsvpStatus {
-  PENDING
-  CONFIRMED
 }
 
 model User {
@@ -18,7 +13,7 @@ model User {
   email     String      @unique
   name      String
   avatar    String?
-  interests String[]
+  interests String      @default("[]")
   city      String
   state     String
   lat       Float?
@@ -66,7 +61,7 @@ model Rsvp {
   id       String     @id @default(cuid())
   userId   String
   eventId  String
-  status   RsvpStatus
+  status   String
   joinedAt DateTime   @default(now())
   user     User       @relation(fields: [userId], references: [id])
   event    Event      @relation(fields: [eventId], references: [id])

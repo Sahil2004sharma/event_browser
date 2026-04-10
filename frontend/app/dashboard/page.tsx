@@ -26,8 +26,18 @@ export default function DashboardPage() {
           saved: []
         };
       }
-      const dashboard = await getDashboard(token);
-      return { guestMode: false, ...dashboard };
+      try {
+        const dashboard = await getDashboard(token);
+        return { guestMode: false, ...dashboard };
+      } catch {
+        // Keep dashboard usable even if backend data store is temporarily unavailable.
+        return {
+          guestMode: true,
+          myEvents: [],
+          attending: [],
+          saved: []
+        };
+      }
     }
   });
   useEffect(() => connectEventStream(queryClient), [queryClient]);

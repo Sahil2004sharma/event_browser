@@ -6,9 +6,16 @@ import { sendEmail } from "../lib/resend";
 import { broadcastEvent, registerSseClient, unregisterSseClient } from "../lib/realtime";
 
 const router = Router();
+
+function descriptionWordCount(description: string): number {
+  return description.trim().split(/\s+/).filter(Boolean).length;
+}
+
 const createSchema = z.object({
   title: z.string().min(3),
-  description: z.string().min(10),
+  description: z.string().refine((s) => descriptionWordCount(s) > 50, {
+    message: "The description must exceed 50 words."
+  }),
   category: z.string(),
   imageUrl: z.string().url().optional().nullable(),
   dateTime: z.string().datetime(),
@@ -59,7 +66,15 @@ router.get("/", async (req, res) => {
       ...(startDate || endDate
         ? { dateTime: { ...(startDate ? { gte: new Date(startDate) } : {}), ...(endDate ? { lte: new Date(endDate) } : {}) } }
         : {}),
-      ...(search ? { OR: [{ title: { contains: search, mode: "insensitive" } }, { description: { contains: search, mode: "insensitive" } }, { category: { contains: search, mode: "insensitive" } }] } : {})
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search } },
+              { description: { contains: search } },
+              { category: { contains: search } }
+            ]
+          }
+        : {})
     },
     include: { organizer: true, _count: { select: { rsvps: { where: { status: "CONFIRMED" } } } } },
     orderBy: { dateTime: "asc" }
@@ -91,8 +106,8 @@ router.post("/", requireAuth, async (req, res) => {
   const duplicate = await prisma.event.findFirst({
     where: {
       organizerId: user.id,
-      title: { equals: parsed.data.title, mode: "insensitive" },
-      location: { equals: parsed.data.location, mode: "insensitive" },
+      title: { equals: parsed.data.title },
+      location: { equals: parsed.data.location },
       dateTime: new Date(parsed.data.dateTime),
       isCancelled: false
     }

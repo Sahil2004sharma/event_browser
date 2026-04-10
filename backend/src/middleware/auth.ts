@@ -1,6 +1,7 @@
 import { createClerkClient, verifyToken } from "@clerk/backend";
 import type { NextFunction, Request, Response } from "express";
 import { env } from "../lib/env";
+import { verifyLocalAuthToken } from "../lib/token";
 
 const clerk = createClerkClient({ secretKey: env.CLERK_SECRET_KEY || "dev" });
 
@@ -15,6 +16,14 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     const header = req.headers.authorization;
     const token = header?.startsWith("Bearer ") ? header.slice(7) : undefined;
     if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    try {
+      const payload = verifyLocalAuthToken(token);
+      req.auth = { clerkId: payload.sub, email: payload.email, name: payload.name };
+      return next();
+    } catch {
+      // Continue trying other auth providers.
+    }
 
     if (!env.CLERK_SECRET_KEY && token.startsWith("dev:")) {
       const decoded = JSON.parse(Buffer.from(token.slice(4), "base64").toString("utf-8")) as { id?: string; email?: string; name?: string };
