@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RsvpStatus {
+  PENDING
+  CONFIRMED
+}
+
+model User {
+  id        String      @id @default(cuid())
+  clerkId   String      @unique
+  email     String      @unique
+  name      String
+  avatar    String?
+  interests String[]
+  city      String
+  state     String
+  lat       Float?
+  lng       Float?
+  events    Event[]
+  rsvps     Rsvp[]
+  comments  Comment[]
+  saved     SavedEvent[]
+  reviews   Review[]
+  isVerifiedOrganizer Boolean @default(false)
+  whatsappNumber String?
+  discordLink String?
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  category    String
+  imageUrl    String?
+  dateTime    DateTime
+  location    String
+  address     String
+  lat         Float
+  lng         Float
+  capacity    Int
+  entryFee    Float      @default(0)
+  prizeDetails String?
+  whatsappNumber String?
+  discordLink String?
+  qualityScore Int       @default(0)
+  isVerified  Boolean    @default(false)
+  isPrivate   Boolean     @default(false)
+  isCancelled Boolean     @default(false)
+  organizerId String
+  organizer   User        @relation(fields: [organizerId], references: [id])
+  rsvps       Rsvp[]
+  comments    Comment[]
+  savedBy     SavedEvent[]
+  reviews     Review[]
+  createdAt   DateTime    @default(now())
+}
+
+model Rsvp {
+  id       String     @id @default(cuid())
+  userId   String
+  eventId  String
+  status   RsvpStatus
+  joinedAt DateTime   @default(now())
+  user     User       @relation(fields: [userId], references: [id])
+  event    Event      @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SavedEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
